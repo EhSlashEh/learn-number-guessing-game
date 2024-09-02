@@ -4,15 +4,11 @@
 echo "Enter your username:"
 read username
 
-# Connect to the PostgreSQL database and run SQL commands
-psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, games_played, best_game FROM users WHERE username='$username';" > temp.txt
+# Connect to the PostgreSQL database and get user details
+read -r user_id games_played best_game <<< $(psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, games_played, best_game FROM users WHERE username='$username';")
 
-if [ -s temp.txt ]; then
-    # User exists, extract data
-    user_id=$(awk -F'|' '{print $1}' temp.txt)
-    games_played=$(awk -F'|' '{print $2}' temp.txt)
-    best_game=$(awk -F'|' '{print $3}' temp.txt)
-    
+if [ -n "$user_id" ]; then
+    # User exists
     if [ -z "$best_game" ]; then
         best_game="N/A"  # Handle cases where best_game might be NULL
     fi
