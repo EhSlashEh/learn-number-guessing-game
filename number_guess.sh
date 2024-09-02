@@ -7,9 +7,6 @@ PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 echo "Enter your username:"
 read USERNAME
 
-# Truncate username to 22 characters if it's longer
-USERNAME=${USERNAME:0:22}
-
 # Check if the user exists in the database
 USER_DATA=$($PSQL "SELECT user_id, games_played, best_game FROM users WHERE username='$USERNAME';")
 
