@@ -5,9 +5,11 @@ echo "Enter your username:"
 read username
 
 # Connect to the PostgreSQL database and get user details
-read -r user_id games_played best_game <<< $(psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, COALESCE(games_played, 0), COALESCE(best_game, 9999) FROM users WHERE username='$username';")
+USER_DETAILS=$(psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, COALESCE(games_played, 0), COALESCE(best_game, 9999) FROM users WHERE username='$username';")
 
-if [ -n "$user_id" ]; then
+# Check if the user exists
+if [ -n "$USER_DETAILS" ]; then
+    IFS="|" read -r user_id games_played best_game <<< "$USER_DETAILS"
     # User exists
     echo "Welcome back, $username! You have played $games_played games, and your best game took $best_game guesses."
 else
