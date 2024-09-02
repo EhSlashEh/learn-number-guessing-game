@@ -1,45 +1,21 @@
---
--- PostgreSQL database dump
---
+-- PostgreSQL database setup for the number guessing game
 
--- Dumped from database version 12.17 (Ubuntu 12.17-1.pgdg22.04+1)
--- Dumped by pg_dump version 12.17 (Ubuntu 12.17-1.pgdg22.04+1)
+-- Drop the database if it exists
+DROP DATABASE IF EXISTS number_guess;
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-DROP DATABASE number_guess;
---
--- Name: number_guess; Type: DATABASE; Schema: -; Owner: freecodecamp
---
-
+-- Create the database
 CREATE DATABASE number_guess WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C.UTF-8' LC_CTYPE = 'C.UTF-8';
 
-
-ALTER DATABASE number_guess OWNER TO freecodecamp;
-
+-- Connect to the database
 \connect number_guess
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+-- Create the users table
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(22) UNIQUE NOT NULL,
+    games_played INT NOT NULL DEFAULT 0,
+    best_game INT
+);
 
---
--- PostgreSQL database dump complete
---
-
+-- Insert initial user data (optional)
+-- INSERT INTO users (username, games_played, best_game) VALUES ('example_user', 5, 3);
