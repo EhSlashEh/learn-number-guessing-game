@@ -7,6 +7,9 @@ PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 echo "Enter your username:"
 read USERNAME
 
+# Truncate username to 22 characters if it's longer
+USERNAME=${USERNAME:0:22}
+
 # Check if the user exists in the database
 USER_DATA=$($PSQL "SELECT user_id, games_played, best_game FROM users WHERE username='$USERNAME';")
 
@@ -54,9 +57,9 @@ done
 # Retrieve the user ID
 USER_ID=$($PSQL "SELECT user_id FROM users WHERE username='$USERNAME';")
 # Retrieve the number of games played
-GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE username='$USERNAME';")
+GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE user_id=$USER_ID;")
 # Retrieve the best game score
-BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE username='$USERNAME';")
+BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE user_id=$USER_ID;")
 
 # Increment the number of games played
 GAMES_PLAYED=$(( GAMES_PLAYED + 1 ))
