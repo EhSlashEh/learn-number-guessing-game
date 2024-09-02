@@ -8,12 +8,24 @@ read username
 psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, games_played, best_game FROM users WHERE username='$username';" > temp.txt
 
 if [ -s temp.txt ]; then
-    # User exists
-    echo "Welcome back, $username!"
+    # User exists, extract data
+    user_id=$(awk -F'|' '{print $1}' temp.txt)
+    games_played=$(awk -F'|' '{print $2}' temp.txt)
+    best_game=$(awk -F'|' '{print $3}' temp.txt)
+    
+    if [ -z "$best_game" ]; then
+        best_game="N/A"  # Handle cases where best_game might be NULL
+    fi
+
+    echo "Welcome back, $username! You have played $games_played games, and your best game took $best_game guesses."
 else
     # User does not exist, insert new user
     echo "Welcome, $username! It looks like this is your first time here."
     psql -U freecodecamp -d number_guess -c "INSERT INTO users (username, games_played) VALUES ('$username', 0);"
+
+    # Initialize games_played and best_game
+    games_played=0
+    best_game="N/A"
 fi
 
 # Game logic
