@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Enter your username:"
 read USERNAME
 USERNAME=${USERNAME:0:22}  # Truncate to 22 characters
