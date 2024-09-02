@@ -17,7 +17,7 @@ if [ -n "$user_id" ]; then
 else
     # User does not exist, insert new user
     echo "Welcome, $username! It looks like this is your first time here."
-    psql -U freecodecamp -d number_guess -c "INSERT INTO users (username, games_played) VALUES ('$username', 0);"
+    psql -U freecodecamp -d number_guess -c "INSERT INTO users (username, games_played) VALUES ('$username', 0);" > /dev/null 2>&1
 
     # Initialize games_played and best_game
     games_played=0
@@ -66,4 +66,4 @@ if [ -z "$BEST_GAME" ] || [ "$GUESSES" -lt "$BEST_GAME" ]; then
 fi
 
 # Update user record
-psql -U freecodecamp -d number_guess -c "UPDATE users SET games_played=$GAMES_PLAYED, best_game=$BEST_GAME WHERE user_id=$USER_ID;"
+psql -U freecodecamp -d number_guess -c "UPDATE users SET games_played=$GAMES_PLAYED, best_game=$BEST_GAME WHERE user_id=$USER_ID;" > /dev/null 2>&1
