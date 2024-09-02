@@ -1,19 +1,22 @@
 #!/bin/bash
+
+# Prompt for username
 echo "Enter your username:"
-read USERNAME
-USERNAME=${USERNAME:0:22}  # Truncate to 22 characters
+read username
 
-USER_DATA=$($PSQL "SELECT user_id, games_played, best_game FROM users WHERE username='$USERNAME';")
+# Connect to the PostgreSQL database and run SQL commands
+psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id, games_played, best_game FROM users WHERE username='$username';" > temp.txt
 
-if [[ -z $USER_DATA ]]; then
-  echo "Welcome, $USERNAME! It looks like this is your first time here."
-  INSERT_USER_RESULT=$($PSQL "INSERT INTO users(username, games_played) VALUES('$USERNAME', 0);")
+if [ -s temp.txt ]; then
+    # User exists
+    echo "Welcome back, $username!"
 else
-  echo "$USER_DATA" | while IFS="|" read USER_ID GAMES_PLAYED BEST_GAME; do
-    echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
-  done
+    # User does not exist, insert new user
+    echo "Welcome, $username! It looks like this is your first time here."
+    psql -U freecodecamp -d number_guess -c "INSERT INTO users (username, games_played) VALUES ('$username', 0);"
 fi
 
+# Game logic
 SECRET_NUMBER=$(( RANDOM % 1000 + 1 ))
 GUESSES=0
 
@@ -41,14 +44,18 @@ while true; do
   GUESSES=$(( GUESSES + 1 ))
 done
 
-USER_ID=$($PSQL "SELECT user_id FROM users WHERE username='$USERNAME';")
-GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE user_id=$USER_ID;")
-BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE user_id=$USER_ID;")
+# After game ends, update user data
+USER_ID=$(psql -U freecodecamp -d number_guess -t -A -c "SELECT user_id FROM users WHERE username='$username';")
+GAMES_PLAYED=$(psql -U freecodecamp -d number_guess -t -A -c "SELECT games_played FROM users WHERE user_id=$USER_ID;")
+BEST_GAME=$(psql -U freecodecamp -d number_guess -t -A -c "SELECT best_game FROM users WHERE user_id=$USER_ID;")
 
+# Increment games played
 GAMES_PLAYED=$(( GAMES_PLAYED + 1 ))
 
-if [[ -z $BEST_GAME || $GUESSES -lt $BEST_GAME ]]; then
+# Check if new best game
+if [ -z "$BEST_GAME" ] || [ "$GUESSES" -lt "$BEST_GAME" ]; then
   BEST_GAME=$GUESSES
 fi
 
-UPDATE_USER_RESULT=$($PSQL "UPDATE users SET games_played=$GAMES_PLAYED, best_game=$BEST_GAME WHERE user_id=$USER_ID;")
+# Update user record
+psql -U freecodecamp -d number_guess -c "UPDATE users SET games_played=$GAMES_PLAYED, best_game=$BEST_GAME WHERE user_id=$USER_ID;"
